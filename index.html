@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+        <title>DeepAR</title>
+        <style>
+            canvas.deepar {
+                border: 0px none;
+                background-color: black;
+                display: block;
+                margin: auto;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+            body {
+                margin: 0px;
+                padding: 0px;
+            }
+
+            #loader-wrapper {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+                background-color: #fff;
+                text-align: center;
+            }
+
+            .loader {
+                display: inline-block;
+                position: relative;
+                top: 42%;
+                z-index: 1000;
+
+                width: 90px;
+                height: 90px;
+                margin: auto;
+                background-color: #00f;
+
+                border-radius: 100%;
+                -webkit-animation: sk-scaleout 1.5s infinite ease-in-out;
+                animation: sk-scaleout 1.5s infinite ease-in-out;
+            }
+
+            @-webkit-keyframes sk-scaleout {
+                0% {
+                    -webkit-transform: scale(0);
+                }
+                100% {
+                    -webkit-transform: scale(1);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes sk-scaleout {
+                0% {
+                    -webkit-transform: scale(0);
+                    transform: scale(0);
+                }
+                100% {
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+
+            .control-buttons {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                width: 200px;
+                height: 500px;
+            }
+
+            .control-buttons > button {
+                width: 200px;
+                height: 50px;
+            }
+
+            .load_img_description {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas
+            class="deepar"
+            id="deepar-canvas"
+            oncontextmenu="event.preventDefault()"
+        ></canvas>
+        <div id="loader-wrapper">
+            <h3 class="load_img_description">
+                Load image from the left menu and apply some effects
+            </h3>
+            <span class="loader"></span>
+        </div>
+
+        <div class="control-buttons">
+            <button id="load-photo-1">Load photo 1</button>
+            <button id="load-photo-2">Load photo 2</button>
+            <button id="load-photo-3">Load photo 3</button>
+            <button id="load-photo-4">Load photo 4</button>
+
+            <button id="apply-makeup-look-1">Apply makeup look 1</button>
+            <button id="apply-makeup-look-2">Apply makeup look 2</button>
+
+            <button id="remove-makeup-filter">Remove makeup filter</button>
+
+            <button id="download-photo">Download photo</button>
+        </div>
+
+        <script type="text/javascript" src="lib/deepar.js"></script>
+        <script type="text/javascript">
+            var canvasHeight = window.innerHeight;
+            var canvasWidth = window.innerWidth;
+
+            // desktop, the width of the canvas is 0.66 * window height and on mobile it's fullscreen
+            if (window.innerWidth > window.innerHeight) {
+                canvasWidth = Math.floor(window.innerHeight * 0.66);
+            }
+
+            var deepAR = DeepAR({
+                canvasWidth: canvasWidth,
+                canvasHeight: canvasHeight,
+                licenseKey:
+                    "944b991cd845ea2ef69ca1a65856b669142248e17e0ccdfcf8d05df69073768573e0e1436c55c5f3",
+                canvas: document.getElementById("deepar-canvas"),
+                numberOfFaces: 1,
+                onInitialize: function () {},
+
+                onScreenshotTaken: function (photo) {
+                    var a = document.createElement("a");
+                    a.href = photo;
+                    a.download = "photo.png";
+                    document.body.appendChild(a);
+                    a.click();
+                },
+            });
+
+            deepAR.onVideoStarted = function () {
+                var loaderWrapper = document.getElementById("loader-wrapper");
+                loaderWrapper.style.display = "none";
+            };
+
+            deepAR.downloadFaceTrackingModel("lib/models-68-extreme.bin");
+
+            // var lastImageByteArray = null;
+            // var lastImageWidth = 0;
+            // var lastImageHeight = 0;
+            var image = new Image();
+
+            function processPhoto(url) {
+                // show loading animation
+                var loaderWrapper = document.getElementById("loader-wrapper");
+                loaderWrapper.style.display = "block";
+
+                // load image from url
+                image.src = url;
+
+                image.onload = function () {
+                    deepAR.processImage(image);
+
+                    // Alternative way to process image is by using processFrame method
+                    // // when loaded, convert to byte array
+                    // var canvas = document.createElement('canvas');
+                    // var ctx = canvas.getContext('2d');
+                    // canvas.width = image.width;
+                    // canvas.height = image.height;
+                    // ctx.drawImage(image, 0, 0);
+                    // var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    // lastImageByteArray = new Uint8Array(imageData.data.buffer);
+                    // lastImageHeight = image.height;
+                    // lastImageWidth = image.width;
+
+                    // //send the image in RGBA byte array format to DeepAR for processing
+                    // deepAR.processFrame(lastImageByteArray, image.width, image.height, false);
+
+                    // hide the loading animation
+                    var loaderWrapper = document.getElementById(
+                        "loader-wrapper"
+                    );
+                    loaderWrapper.style.display = "none";
+                };
+            }
+            // 5 - fda3f079-5f16-4f9b-b9d3-366dbcdfb2a4
+            // 4 - 4a59bfa3-5244-4756-af7a-b1dbea3b8a22
+            // 3 - be5fe4a2-e94d-4f68-9ded-1e9d923f9cae
+            // 2 - 261a145d-c879-408e-86c0-a3a811a92f9d
+            // 1 - 05da8199-7b89-4c79-8874-2ec143bc0f70
+            document.getElementById("load-photo-1").onclick = function () {
+                fetch(
+                    "https://cloud.squidex.io/api/assets/virtual-try-on/05da8199-7b89-4c79-8874-2ec143bc0f70",
+                    {
+                        method: "GET",
+                        // headers: new Headers({
+                        //     "Authorization": "Bearer " + token
+                        // })
+                    }
+                )
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        var url = window.URL.createObjectURL(blob);
+                        console.log(url);
+                        processPhoto(url);
+                    });
+            };
+            document.getElementById("load-photo-2").onclick = function () {
+              fetch(
+                    "https://cloud.squidex.io/api/assets/virtual-try-on/261a145d-c879-408e-86c0-a3a811a92f9d",
+                    {
+                        method: "GET",
+                        // headers: new Headers({
+                        //     "Authorization": "Bearer " + token
+                        // })
+                    }
+                )
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        var url = window.URL.createObjectURL(blob);
+                        console.log(url);
+                        processPhoto(url);
+                    });
+            };
+            document.getElementById("load-photo-3").onclick = function () {
+              fetch(
+                    "https://cloud.squidex.io/api/assets/virtual-try-on/be5fe4a2-e94d-4f68-9ded-1e9d923f9cae",
+                    {
+                        method: "GET",
+                        // headers: new Headers({
+                        //     "Authorization": "Bearer " + token
+                        // })
+                    }
+                )
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        var url = window.URL.createObjectURL(blob);
+                        console.log(url);
+                        processPhoto(url);
+                    });
+            };
+            document.getElementById("load-photo-4").onclick = function () {
+              fetch(
+                    "https://cloud.squidex.io/api/assets/virtual-try-on/4a59bfa3-5244-4756-af7a-b1dbea3b8a22",
+                    {
+                        method: "GET",
+                        // headers: new Headers({
+                        //     "Authorization": "Bearer " + token
+                        // })
+                    }
+                )
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        var url = window.URL.createObjectURL(blob);
+                        console.log(url);
+                        processPhoto(url);
+                    });
+            };
+            document.getElementById(
+                "apply-makeup-look-1"
+            ).onclick = function () {
+                // load filter
+                deepAR.switchEffect(
+                    0,
+                    "makeup",
+                    "./effects/look1",
+                    function () {
+                        // effect loaded, reprocess the image
+                        deepAR.processImage(image);
+                    }
+                );
+            };
+            document.getElementById(
+                "apply-makeup-look-2"
+            ).onclick = function () {
+                // load filter
+                deepAR.switchEffect(
+                    0,
+                    "makeup",
+                    "./effects/look2",
+                    function () {
+                        // effect loaded, reprocess the image
+                        deepAR.processImage(image);
+                    }
+                );
+            };
+            document.getElementById(
+                "remove-makeup-filter"
+            ).onclick = function () {
+                // unload filter
+                deepAR.clearEffect("makeup");
+                // effect unloaded, reprocess the image
+                deepAR.processImage(image);
+            };
+            document.getElementById("download-photo").onclick = function () {
+                deepAR.takeScreenshot();
+            };
+        </script>
+    </body>
+</html>
