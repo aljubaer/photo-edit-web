@@ -188,19 +188,12 @@
                     loaderWrapper.style.display = "none";
                 };
             }
-            // 5 - fda3f079-5f16-4f9b-b9d3-366dbcdfb2a4
-            // 4 - 4a59bfa3-5244-4756-af7a-b1dbea3b8a22
-            // 3 - be5fe4a2-e94d-4f68-9ded-1e9d923f9cae
-            // 2 - 261a145d-c879-408e-86c0-a3a811a92f9d
-            // 1 - 05da8199-7b89-4c79-8874-2ec143bc0f70
+
             document.getElementById("load-photo-1").onclick = function () {
                 fetch(
                     "https://cloud.squidex.io/api/assets/virtual-try-on/05da8199-7b89-4c79-8874-2ec143bc0f70",
                     {
                         method: "GET",
-                        // headers: new Headers({
-                        //     "Authorization": "Bearer " + token
-                        // })
                     }
                 )
                     .then((response) => response.blob())
@@ -215,9 +208,6 @@
                     "https://cloud.squidex.io/api/assets/virtual-try-on/261a145d-c879-408e-86c0-a3a811a92f9d",
                     {
                         method: "GET",
-                        // headers: new Headers({
-                        //     "Authorization": "Bearer " + token
-                        // })
                     }
                 )
                     .then((response) => response.blob())
@@ -232,9 +222,6 @@
                     "https://cloud.squidex.io/api/assets/virtual-try-on/be5fe4a2-e94d-4f68-9ded-1e9d923f9cae",
                     {
                         method: "GET",
-                        // headers: new Headers({
-                        //     "Authorization": "Bearer " + token
-                        // })
                     }
                 )
                     .then((response) => response.blob())
@@ -249,9 +236,6 @@
                     "https://cloud.squidex.io/api/assets/virtual-try-on/4a59bfa3-5244-4756-af7a-b1dbea3b8a22",
                     {
                         method: "GET",
-                        // headers: new Headers({
-                        //     "Authorization": "Bearer " + token
-                        // })
                     }
                 )
                     .then((response) => response.blob())
